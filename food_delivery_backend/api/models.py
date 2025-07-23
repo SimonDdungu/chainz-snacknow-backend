@@ -59,7 +59,7 @@ class MenuItem(models.Model):
         validators=[MinValueValidator(0.00)],
     )
     description = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to="images/menu/", null=True, blank=True)
+    image = models.ImageField(upload_to="images/menu/", default='default_images/default_profile_picture.jpg', null=True, blank=True)
     available = models.BooleanField(default=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
