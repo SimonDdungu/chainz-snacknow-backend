@@ -53,7 +53,7 @@ class MenuItem(models.Model):
     name = models.CharField(max_length=200)
     category = models.CharField(max_length=20, choices=Category, default="main_course")
     price = models.DecimalField(
-        max_digits=7,
+        max_digits=10,
         decimal_places=2,
         default=0.00,
         validators=[MinValueValidator(0.00)],
@@ -93,7 +93,7 @@ class Order(models.Model):
     )
     status = models.CharField(max_length=20, choices=Status, default="pending")
     total_price = models.DecimalField(
-        max_digits=7, decimal_places=2, validators=[MinValueValidator(0.00)]
+        max_digits=11, decimal_places=2, validators=[MinValueValidator(0.00)]
     )
     payment_methods = models.CharField(
         max_length=20, choices=PaymentMethods, default="mobile_money"
@@ -124,7 +124,7 @@ class OrderItem(models.Model):
     )
     quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1)])
     ordered_price = models.DecimalField(
-        max_digits=7, decimal_places=2, validators=[MinValueValidator(0.00)]
+        max_digits=10, decimal_places=2, validators=[MinValueValidator(0.00)]
     )
 
     def save(self):
@@ -147,7 +147,7 @@ class OrderItem(models.Model):
 class Cart(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user_cart")
     total_price = models.DecimalField(
-        max_digits=7, decimal_places=2, validators=[MinValueValidator(0.00)]
+        max_digits=11, decimal_places=2, validators=[MinValueValidator(0.00)]
     )
     updated_at = models.DateTimeField(auto_now=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -201,7 +201,7 @@ class Transaction(models.Model):
     ]
     order = models.ForeignKey(Order, related_name="transactions", on_delete=models.SET_NULL, null=True)
     ordered_id = models.PositiveIntegerField(validators=[MinValueValidator(0)])
-    amount_due = models.DecimalField(decimal_places=2, max_digits=7, validators=[MinValueValidator(0.00)])
+    amount_due = models.DecimalField(decimal_places=2, max_digits=11, validators=[MinValueValidator(0.00)])
     payment_method = models.CharField(max_length=20)
     status = models.CharField(max_length=20, choices=Status, default="pending")
     user = models.ForeignKey(
