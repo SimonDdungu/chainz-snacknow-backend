@@ -65,7 +65,7 @@ class MenuItem(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["-updated_at", "-created_at"]
         unique_together = ['restaurant', 'name']
 
     def __str__(self):
