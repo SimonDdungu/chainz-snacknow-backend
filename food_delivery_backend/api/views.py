@@ -5,25 +5,23 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import get_user_model
 from .models import Restaurant, MenuItem, Order, OrderItem, Cart, CartItem, Transaction
-from .serializers import CustomUserSerializer, RestaurantSerializer, MenuItemSerializer, OrderSerializer, OrderItemSerializer, CartSerializer, CartItemSerializer, TransactionSerializer
+from .serializers import RegisterUserSerializer, CustomUserSerializer, RestaurantSerializer, MenuItemSerializer, OrderSerializer, OrderItemSerializer, CartSerializer, CartItemSerializer, TransactionSerializer
+from rest_framework_simplejwt.tokens import RefreshToken
 
-User = get_user_model()
+
 # User Registration
 class RegisterView(APIView):
     def post(self, request):
-        data = data=request.data
-        serializer = CustomUserSerializer(data)
+        serializer = RegisterUserSerializer(data=request.data)
 
         if serializer.is_valid():
-            user = User.objects.create_user(
-                username=serializer.validated_data['username'],
-                email=serializer.validated_data['email'],
-                password=request.data['password'],  # still gets hashed here
-                address=serializer.validated_data.get('address', ''),
-                phone_number=serializer.validated_data.get('phone_number', ''),
-                is_customer=True
-            )
-            return Response({"message": "User created"}, status=status.HTTP_201_CREATED)
+           user = serializer.save()
+           refresh = RefreshToken.for_user(user)
+           return Response({
+                "message": "User created",
+                "refresh": str(refresh),
+                "access": str(refresh.access_token),
+            }, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -56,7 +54,12 @@ class RestaurantDetailView(RetrieveUpdateDestroyAPIView):
 class MenuItemListCreateView(ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
-    permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return []
+    
     def perform_create(self, serializer):
         restaurant = serializer.validated_data['restaurant']
         if restaurant.user != self.request.user:
@@ -66,7 +69,11 @@ class MenuItemListCreateView(ListCreateAPIView):
 class MenuItemDetailView(RetrieveUpdateDestroyAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
-    permission_classes = [IsAuthenticated]
+    
+    def get_permissions(self):
+        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+            return [IsAuthenticated()]
+        return []
     
     
     
