@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from rest_framework_simplejwt.views import (TokenObtainPairView,TokenRefreshView)
 
 urlpatterns = [
     path('register/', views.RegisterView.as_view(), name='register'),
@@ -7,7 +8,7 @@ urlpatterns = [
     path('restaurants/', views.RestaurantListCreateView.as_view(), name='restaurant-list'),
     path('restaurants/<int:pk>/', views.RestaurantDetailView.as_view(), name='restaurant-detail'),
     path('menu-items/', views.MenuItemListCreateView.as_view(), name='menu-item-list'),
-    path('menu-items/<int:pk>/', views.MenuItemDetailView.as_view(), name='menu-item-detail'),
+    path('menu-items/<str:pk>/', views.MenuItemDetailView.as_view(), name='menu-item-detail'),
     path('cart/', views.CartDetailView.as_view(), name='cart-detail'),
     path('cart-items/', views.CartItemListCreateView.as_view(), name='cart-item-list'),
     path('cart-items/<int:pk>/', views.CartItemDetailView.as_view(), name='cart-item-detail'),
@@ -17,4 +18,8 @@ urlpatterns = [
     path('order-items/<int:pk>/', views.OrderItemDetailView.as_view(), name='order-item-detail'),
     path('transactions/', views.TransactionListCreateView.as_view(), name='transaction-list'),
     path('transactions/<int:pk>/', views.TransactionDetailView.as_view(), name='transaction-detail'),
+    
+    
+    path('auth-api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth-api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
