@@ -5,6 +5,7 @@ from django.core.validators import MinValueValidator
 
 
 class CustomUser(AbstractUser):
+    username = None
     email = models.EmailField(unique=True, blank=False)
     address = models.TextField(blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
@@ -12,7 +13,7 @@ class CustomUser(AbstractUser):
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"]
+    REQUIRED_FIELDS = ["first_name", "last_name"]
 
     def save(self, *args, **kwargs):
         if self.email:  
@@ -20,7 +21,7 @@ class CustomUser(AbstractUser):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.username
+        return self.email
 
 class Restaurant(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user_restaurants")
