@@ -2,19 +2,37 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import Restaurant, MenuItem, Order, OrderItem, Cart, CartItem, Transaction
 
+
+class RegisterUserSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=True)
+    class Meta:
+        model = get_user_model()
+        fields = ['id', 'first_name', 'last_name', 'password', 'email', 'address', 'phone_number', 'is_customer']
+        read_only_fields = ['id', 'is_customer']
+        
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        user = get_user_model()(**validated_data)
+        user.set_password(password) 
+        user.save()
+            
+        return user
+
+
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
-        fields = ['id', 'username', 'email', 'address', 'phone_number', 'is_customer']
+        fields = ['id', 'first_name', 'last_name', 'email', 'address', 'phone_number', 'is_customer']
         read_only_fields = ['id', 'is_customer']
 
 class RestaurantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Restaurant
-        fields = ['id', 'name', 'location', 'description', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'location', 'description', 'profile_picture','created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 class MenuItemSerializer(serializers.ModelSerializer):
+    restaurant = RestaurantSerializer(read_only=True)
     class Meta:
         model = MenuItem
         fields = ['id', 'restaurant', 'name', 'category', 'price', 'description', 'image', 'available', 'created_at', 'updated_at']
