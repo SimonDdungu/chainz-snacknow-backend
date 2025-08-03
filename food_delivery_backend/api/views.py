@@ -1,5 +1,5 @@
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, RetrieveUpdateDestroyAPIView, ListAPIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -75,8 +75,22 @@ class MenuItemDetailView(RetrieveUpdateDestroyAPIView):
             return [IsAuthenticated()]
         return []
     
+class CategoriesView(APIView):
+     authentication_classes = []
+     def get(self, request):
+        categories = [{'category': key, 'label': label} for key, label in MenuItem.Category]
+        return Response(list(categories))
     
-    
+class CategoriesViewItems(APIView):
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request, category):
+        # Filter menu items by category
+        items = MenuItem.objects.filter(category=category)
+        serializer = MenuItemSerializer(items, many=True)
+        return Response(serializer.data)
+
 
 # Cart Views
 class CartDetailView(RetrieveUpdateAPIView):
